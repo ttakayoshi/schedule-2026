@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026年 スケジュール一覧</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Sans', 'Meiryo', sans-serif; background: #f9f9f9; color: #222; font-size: 15px; }
+  .page-wrap { max-width: 860px; margin: 0 auto; }
+  header { background: #1a2540; color: #fff; padding: 16px 28px; font-size: 19px; font-weight: 700; letter-spacing: 0.05em; }
+  header span { font-size: 13px; opacity: 0.6; margin-left: 12px; font-weight: 400; }
+  .jump-nav { position: sticky; top: 0; z-index: 20; background: #fff; border-bottom: 1px solid #d0d5e8; padding: 6px 16px; display: flex; gap: 5px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .jump-nav::-webkit-scrollbar { display: none; }
+  .jump-nav a { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; text-decoration: none; background: #eef1f8; color: #2d3a6b; border: 1px solid #c8d0e8; transition: background 0.15s; }
+  .jump-nav a:hover { background: #2d3a6b; color: #fff; }
+  .jump-nav .sep { width: 1px; background: #d0d5e8; margin: 2px 4px; flex-shrink: 0; }
+  .jump-nav a.nav-tbd { background: #fff3e0; color: #b45309; border-color: #f6c978; }
+  .jump-nav a.nav-tbd:hover { background: #b45309; color: #fff; }
+  .jump-nav a.nav-done { background: #f1f5f9; color: #4b5563; border-color: #c8cdd6; }
+  .jump-nav a.nav-done:hover { background: #4b5563; color: #fff; }
+  .legend { display: flex; flex-direction: column; gap: 6px; padding: 10px 28px; background: #fff; border-bottom: 1px solid #e0e0e0; font-size: 13px; color: #555; }
+  .legend-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .legend-label { font-size: 12px; color: #888; font-weight: 600; white-space: nowrap; min-width: 70px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .ltag { display: inline-block; padding: 2px 9px; border-radius: 3px; color: #fff; font-size: 12px; font-weight: 600; }
+  .month-block { margin-bottom: 0; }
+  .month-label { background: #2d3a6b; color: #fff; padding: 7px 28px; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; position: sticky; top: 38px; z-index: 10; }
+  .day-block { border-bottom: 1px solid #ececec; }
+  .day-header { background: #eef1f8; padding: 7px 28px; font-weight: 700; font-size: 14px; color: #1a2540; letter-spacing: 0.03em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .day-header .range-arrow { color: #888; font-weight: 400; font-size: 13px; }
+  .day-header .days-count { color: #888; font-size: 12px; font-weight: 400; }
+  .day-header.sun { border-left: 4px solid #d44; }
+  .day-header.sat { border-left: 4px solid #44a; }
+  .day-header.weekday { border-left: 4px solid #2d3a6b; }
+  .day-header.past { opacity: 0.55; }
+  .events { padding: 0 28px; }
+  .event-row { padding: 9px 0; border-bottom: 1px dotted #e8e8e8; }
+  .event-row:last-child { border-bottom: none; }
+  .event-main { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 3px; color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+  .tag-election  { background: #c0392b; }
+  .tag-diplomacy { background: #2471a3; }
+  .tag-garden    { background: #8e44ad; }
+  .tag-festival  { background: #d68910; }
+  .subcat { display: inline-block; padding: 2px 7px; border-radius: 3px; background: #e8ecf4; color: #445; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+  .event-name { font-weight: 600; line-height: 1.5; }
+  .event-place { color: #555; font-size: 13px; white-space: nowrap; }
+  .event-place::before { content: '📍 '; }
+  .status { display: inline-block; font-size: 12px; padding: 2px 7px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+  .s-done    { background: #e8eaf6; color: #4527a0; }
+  .s-fixed   { background: #e8f5e9; color: #2e7d32; }
+  .s-pending { background: #fff3e0; color: #e65100; }
+  .s-adj     { background: #e3f2fd; color: #1565c0; }
+  .s-tbd     { background: #fce4ec; color: #c62828; }
+  .attendee { color: #888; font-size: 12px; white-space: nowrap; }
+  .attendee::before { content: '👤 '; }
+  .event-meta { margin-top: 5px; display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; padding-left: 2px; }
+  .event-notes { font-size: 12px; color: #777; font-style: italic; line-height: 1.5; }
+  .event-notes::before { content: '💬 '; font-style: normal; }
+  .event-source { font-size: 12px; color: #2471a3; text-decoration: none; white-space: nowrap; }
+  .event-source::before { content: '🔗 '; }
+  .event-source:hover { text-decoration: underline; }
+  .unsched-section { margin: 24px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+  .unsched-title { background: #555; color: #fff; padding: 9px 20px; font-weight: 700; font-size: 14px; }
+  .done-title { background: #6b7280; }
+  .unsched-row { padding: 9px 20px; border-bottom: 1px dotted #e8e8e8; }
+  .done-section .unsched-row { opacity: 0.75; }
+  .unsched-row:last-child { border-bottom: none; }
+  footer { text-align: center; padding: 24px; color: #aaa; font-size: 12px; }
+  @media (max-width: 640px) { .events { padding: 0 16px; } .day-header { padding: 7px 16px; } .event-place { display: none; } }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<header>2026年 スケジュール一覧<span>events_calendar_2026 — 最終更新: 2026年6月16日</span></header>
+<nav class="jump-nav">
+  <a href="#m01">1月</a>
+  <a href="#m02">2月</a>
+  <a href="#m03">3月</a>
+  <a href="#m04">4月</a>
+  <a href="#m05">5月</a>
+  <a href="#m06">6月</a>
+  <a href="#m07">7月</a>
+  <a href="#m08">8月</a>
+  <a href="#m09">9月</a>
+  <a href="#m10">10月</a>
+  <a href="#m11">11月</a>
+  <a href="#m12">12月</a>
+  <div class="sep"></div>
+  <a href="#tbd" class="nav-tbd">📋 未確定・要確認</a>
+  <a href="#done" class="nav-done">✅ 実施済み・終了</a>
+</nav>
+<div class="legend">
+  <div class="legend-row">
+    <span class="legend-label">カテゴリ</span>
+    <span class="ltag tag-election">①選挙</span>
+    <span class="ltag tag-diplomacy">②外交・国際会議</span>
+    <span class="ltag tag-garden">③園遊会</span>
+    <span class="ltag tag-festival">④都内の祭り・イベント</span>
+  </div>
+  <div class="legend-row">
+    <span class="legend-label">ステータス</span>
+    <span class="status s-fixed">確定</span>
+    <span class="status s-adj">調整中</span>
+    <span class="status s-pending">未確定</span>
+    <span class="status s-tbd">要確認</span>
+    <span class="status s-done">実施済み</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ 1月 ═══════════════════════════ -->
+<div class="month-block" id="m01">
+<div class="month-label">2026年 1月</div>
+<div class="day-block">
+  <div class="day-header weekday past">
+    2026-01-13（火）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">外交往来(実施済み)</span>
+        <span class="event-name">李在明 韓国大統領 来日(日韓首脳会談)</span>
+        <span class="event-place">奈良・法隆寺</span>
+        <span class="attendee">高市首相・李在明大統領</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun past">
+    2026-01-25（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">福井県知事選</span>
+        <span class="event-place">福井県</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /1月 -->
+
+<!-- ═══════════════════════════ 2月 ═══════════════════════════ -->
+<div class="month-block" id="m02">
+<div class="month-label">2026年 2月</div>
+<div class="day-block">
+  <div class="day-header sun past">
+    2026-02-08（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">国政選挙</span>
+        <span class="event-name">第51回衆議院議員総選挙</span>
+        <span class="event-place">全国</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">冒頭解散による短期決戦。投開票済み</span> <a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">大阪府知事選</span>
+        <span class="event-place">大阪府</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">山口県知事選</span>
+        <span class="event-place">山口県</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">長崎県知事選</span>
+        <span class="event-place">長崎県</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /2月 -->
+
+<!-- ═══════════════════════════ 3月 ═══════════════════════════ -->
+<div class="month-block" id="m03">
+<div class="month-label">2026年 3月</div>
+<div class="day-block">
+  <div class="day-header sun past">
+    2026-03-08（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">石川県知事選</span>
+        <span class="event-place">石川県</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday past">
+    2026-03-19（木）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">外交往来(実施済み)</span>
+        <span class="event-name">高市首相 初訪米(日米首脳会談)</span>
+        <span class="event-place">米国・ワシントン</span>
+        <span class="attendee">高市首相</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">就任後初訪米</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /3月 -->
+
+<!-- ═══════════════════════════ 4月 ═══════════════════════════ -->
+<div class="month-block" id="m04">
+<div class="month-label">2026年 4月</div>
+<div class="day-block">
+  <div class="day-header sun past">
+    2026-04-05（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">京都府知事選</span>
+        <span class="event-place">京都府</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday past">
+    2026-04-17（金）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-garden">③園遊会</span>
+        <span class="subcat">園遊会</span>
+        <span class="event-name">春の園遊会2026</span>
+        <span class="event-place">赤坂御苑(東京・元赤坂)</span>
+        <span class="attendee">両議院議長副議長・議員・首相・国務大臣・知事等</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://www.kunaicho.go.jp/about/gokomu/kyuchu/enyukai/enyukai.html" target="_blank">www.kunaicho.go.jp</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /4月 -->
+
+<!-- ═══════════════════════════ 5月 ═══════════════════════════ -->
+<div class="month-block" id="m05">
+<div class="month-label">2026年 5月</div>
+<div class="day-block">
+  <div class="day-header weekday past">
+    2026-05-19（火）<span class="range-arrow">〜</span>05/20（水）
+    <span class="days-count">2日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">外交往来(実施済み)</span>
+        <span class="event-name">高市首相 韓国訪問(日韓首脳会談)</span>
+        <span class="event-place">韓国・安東</span>
+        <span class="attendee">高市首相・李在明大統領</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">シャトル外交</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun past">
+    2026-05-31（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">新潟県知事選</span>
+        <span class="event-place">新潟県</span>
+        <span class="status s-done">実施済み</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /5月 -->
+
+<!-- ═══════════════════════════ 6月 ═══════════════════════════ -->
+<div class="month-block" id="m06">
+<div class="month-label">2026年 6月</div>
+<div class="day-block">
+  <div class="day-header sun past">
+    2026-06-07（日）<span class="range-arrow">〜</span>06/17（水）
+    <span class="days-count">11日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">山王祭(日枝神社)期間</span>
+        <span class="event-place">東京・日枝神社周辺</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">2026は2年に一度の本祭</span> <a class="event-source" href="https://www.hiejinja.net/matsuri/" target="_blank">www.hiejinja.net</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday past">
+    2026-06-12（金）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">山王祭 神幸祭(神幸行列)</span>
+        <span class="event-place">東京・日枝神社周辺</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">本祭の目玉</span> <a class="event-source" href="https://www.hiejinja.net/matsuri/" target="_blank">www.hiejinja.net</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun past">
+    2026-06-14（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">山王祭 下町連合渡御</span>
+        <span class="event-place">東京・日枝神社周辺</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://www.hiejinja.net/matsuri/" target="_blank">www.hiejinja.net</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-06-15（月）<span class="range-arrow">〜</span>06/17（水）
+    <span class="days-count">3日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">国際会議</span>
+        <span class="event-name">G7サミット</span>
+        <span class="event-place">フランス・エヴィアン</span>
+        <span class="attendee">高市首相</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">当初6/14〜16から後ろ倒し(6/14がトランプ米大統領誕生日と重複のため)</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/ecm/ec/pagew_000001_02321.html" target="_blank">www.mofa.go.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-06-21（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">五所川原市長選</span>
+        <span class="event-place">青森県五所川原市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">石岡市長選</span>
+        <span class="event-place">茨城県石岡市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">宮津市長選</span>
+        <span class="event-place">京都府宮津市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-06-28（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">杉並区長選</span>
+        <span class="event-place">東京都杉並区</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">東京都内</span> <a class="event-source" href="https://www.senkyo.metro.tokyo.lg.jp/election/schedule/senkyo2026" target="_blank">www.senkyo.metro.tokyo.lg.jp</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">黒石市長選</span>
+        <span class="event-place">青森県黒石市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">狛江市長選</span>
+        <span class="event-place">東京都狛江市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">東京都内</span> <a class="event-source" href="https://www.senkyo.metro.tokyo.lg.jp/election/schedule/senkyo2026" target="_blank">www.senkyo.metro.tokyo.lg.jp</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">加古川市長選</span>
+        <span class="event-place">兵庫県加古川市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">大町市長選</span>
+        <span class="event-place">長野県大町市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /6月 -->
+
+<!-- ═══════════════════════════ 7月 ═══════════════════════════ -->
+<div class="month-block" id="m07">
+<div class="month-label">2026年 7月</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-07-05（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">滋賀県知事選</span>
+        <span class="event-place">滋賀県</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">調布市長選</span>
+        <span class="event-place">東京都調布市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">東京都内</span> <a class="event-source" href="https://www.senkyo.metro.tokyo.lg.jp/election/schedule/senkyo2026" target="_blank">www.senkyo.metro.tokyo.lg.jp</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">鴻巣市長選</span>
+        <span class="event-place">埼玉県鴻巣市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-07-09（木）<span class="range-arrow">〜</span>07/10（金）
+    <span class="days-count">2日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">ほおずき市(浅草寺)</span>
+        <span class="event-place">東京・浅草</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">8:00〜21:00。ほおずきが無くなり次第終了</span> <a class="event-source" href="https://www.senso-ji.jp/" target="_blank">www.senso-ji.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-07-12（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">田川市長選</span>
+        <span class="event-place">福岡県田川市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">東松山市長選</span>
+        <span class="event-place">埼玉県東松山市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">下野市長選</span>
+        <span class="event-place">栃木県下野市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-07-13（月）<span class="range-arrow">〜</span>07/16（木）
+    <span class="days-count">4日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">みたままつり(靖国神社)</span>
+        <span class="event-place">東京・九段</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">2026年は7/13〜16確定。毎年7/13〜16固定。境内に3万灯の提灯・ぼんぼり。夜間中庭参拝あり</span> <a class="event-source" href="https://www.yasukuni.or.jp/schedule/saiji.html" target="_blank">www.yasukuni.or.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-07-19（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">あきる野市長選</span>
+        <span class="event-place">東京都あきる野市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">東京都内</span> <a class="event-source" href="https://www.senkyo.metro.tokyo.lg.jp/election/schedule/senkyo2026" target="_blank">www.senkyo.metro.tokyo.lg.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sat">
+    2026-07-25（土）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">隅田川花火大会</span>
+        <span class="event-place">東京・隅田川</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">19:00〜20:30。第一会場19:00/第二会場19:30〜。約2万発</span> <a class="event-source" href="https://www.sumidagawa-hanabi.com/" target="_blank">www.sumidagawa-hanabi.com</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /7月 -->
+
+<!-- ═══════════════════════════ 8月 ═══════════════════════════ -->
+<div class="month-block" id="m08">
+<div class="month-label">2026年 8月</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-08-09（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">長野県知事選</span>
+        <span class="event-place">長野県</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">和歌山市長選</span>
+        <span class="event-place">和歌山県和歌山市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">小樽市長選</span>
+        <span class="event-place">北海道小樽市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-08-11（火）<span class="range-arrow">〜</span>08/16（日）
+    <span class="days-count">6日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">深川八幡祭り(富岡八幡宮)</span>
+        <span class="event-place">東京・門前仲町</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">2026は3年に一度の本祭。神輿連合渡御は8/16(日)</span> <a class="event-source" href="https://www.tomiokahachimangu.or.jp/" target="_blank">www.tomiokahachimangu.or.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sat">
+    2026-08-29（土）<span class="range-arrow">〜</span>08/30（日）
+    <span class="days-count">2日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">高円寺阿波おどり</span>
+        <span class="event-place">東京・高円寺</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">第67回。17:00〜20:00。高円寺駅南北商店街および高南通り</span> <a class="event-source" href="https://koenji-awaodori.com/" target="_blank">koenji-awaodori.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">浅草サンバカーニバル</span>
+        <span class="event-place">東京・浅草</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">第41回。パレードコンテスト13:30スタート。馬道通り〜雷門通り（約800m）</span> <a class="event-source" href="https://www.asakusa-samba.org/" target="_blank">www.asakusa-samba.org</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-08-30（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">香川県知事選</span>
+        <span class="event-place">香川県</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">高山市長選</span>
+        <span class="event-place">岐阜県高山市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・町長選</span>
+        <span class="event-name">粕屋町長選</span>
+        <span class="event-place">福岡県粕屋町</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /8月 -->
+
+<!-- ═══════════════════════════ 9月 ═══════════════════════════ -->
+<div class="month-block" id="m09">
+<div class="month-label">2026年 9月</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-09-06（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">熱海市長選</span>
+        <span class="event-place">静岡県熱海市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">交野市長選</span>
+        <span class="event-place">大阪府交野市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header sun">
+    2026-09-13（日）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">知事選</span>
+        <span class="event-name">沖縄県知事選</span>
+        <span class="event-place">沖縄県</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">根室市長選</span>
+        <span class="event-place">北海道根室市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-election">①選挙</span>
+        <span class="subcat">市長・区長選</span>
+        <span class="event-name">美馬市長選</span>
+        <span class="event-place">徳島県美馬市</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-09-22（火）<span class="range-arrow">〜</span>09/28（月）
+    <span class="days-count">7日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">国際会議</span>
+        <span class="event-name">国連総会 一般討論</span>
+        <span class="event-place">米国・ニューヨーク</span>
+        <span class="attendee">首相</span>
+        <span class="status s-pending">未確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">例年9月第3週火曜から約1週間。2026は9/22〜28頃の見込み（正式日程未発表）</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /9月 -->
+
+<!-- ═══════════════════════════ 10月 ═══════════════════════════ -->
+<div class="month-block" id="m10">
+<div class="month-label">2026年 10月</div>
+<div class="day-block">
+  <div class="day-header sat">
+    2026-10-24（土）
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">花火</span>
+        <span class="event-name">東京湾大華火祭</span>
+        <span class="event-place">東京都中央区・晴海埠頭沖</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">11年ぶり復活。17:30〜19:00。約12000発。夏季の雷雨回避のため10月開催に変更。全席申込制（チケット制）</span> <a class="event-source" href="https://sorahanabi.com/tokyo/chuo/tokyowandaihanabisai.html" target="_blank">sorahanabi.com</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /10月 -->
+
+<!-- ═══════════════════════════ 11月 ═══════════════════════════ -->
+<div class="month-block" id="m11">
+<div class="month-label">2026年 11月</div>
+<div class="day-block">
+  <div class="day-header sat">
+    2026-11-07（土）<span class="range-arrow">〜</span>11/19（木）
+    <span class="days-count">13日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-festival">④祭り</span>
+        <span class="subcat">祭り</span>
+        <span class="event-name">酉の市(花園神社・浅草鷲神社等)</span>
+        <span class="event-place">東京都内</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">一の酉11/7(土)・二の酉11/19(木)。2026は二の酉まで（三の酉なし）</span> <a class="event-source" href="https://torinoichi.jp/" target="_blank">torinoichi.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-11-09（月）<span class="range-arrow">〜</span>11/20（金）
+    <span class="days-count">12日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">国際会議</span>
+        <span class="event-name">COP31(国連気候変動枠組条約)</span>
+        <span class="event-place">トルコ・アンタルヤ</span>
+        <span class="attendee">環境相中心(首脳級に首相出席の可能性)</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+      </div>
+  </div>
+</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-11-18（水）<span class="range-arrow">〜</span>11/19（木）
+    <span class="days-count">2日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">国際会議</span>
+        <span class="event-name">APEC首脳会議</span>
+        <span class="event-place">中国・深圳</span>
+        <span class="attendee">首相</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">日中関係次第で個別会談の有無が焦点</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /11月 -->
+
+<!-- ═══════════════════════════ 12月 ═══════════════════════════ -->
+<div class="month-block" id="m12">
+<div class="month-label">2026年 12月</div>
+<div class="day-block">
+  <div class="day-header weekday">
+    2026-12-14（月）<span class="range-arrow">〜</span>12/15（火）
+    <span class="days-count">2日間</span>
+  </div>
+  <div class="events">
+      <div class="event-row">
+        <div class="event-main">
+        <span class="tag tag-diplomacy">②外交</span>
+        <span class="subcat">国際会議</span>
+        <span class="event-name">G20サミット</span>
+        <span class="event-place">米国・フロリダ州ドラール（トランプ・ナショナル・ドラール・マイアミ）</span>
+        <span class="attendee">首相</span>
+        <span class="status s-fixed">確定</span>
+        </div>
+        <div class="event-meta"><span class="event-notes">議長国アメリカ。米国務省発表で12/14〜15確定。会場はトランプ大統領所有のゴルフリゾート</span> <a class="event-source" href="https://g20.org/" target="_blank">g20.org</a></div>
+      </div>
+  </div>
+</div>
+</div><!-- /12月 -->
+
+<!-- ═══════════════════════════ 日程未確定 ═══════════════════════════ -->
+<div class="unsched-section" id="tbd">
+  <div class="unsched-title">📋 日程未確定・要確認のイベント</div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-election">①選挙</span>
+      <span class="subcat">国政選挙</span>
+      <span class="event-name">参議院議員通常選挙(次回)</span>
+      <span class="event-place">全国</span>
+      <span class="status s-pending">未確定</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">次回は2028年7月の見込み</span> <a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-election">①選挙</span>
+      <span class="subcat">知事選</span>
+      <span class="event-name">福島県知事選</span>
+      <span class="event-place">福島県</span>
+      <span class="status s-tbd">未確定・要確認</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">知事任期満了11/11。前回(2022)は10/30投票。正式告示は未発表</span> <a class="event-source" href="https://www.pref.fukushima.lg.jp/sec/62010a/22-chiji-kijitsu.html" target="_blank">www.pref.fukushima.lg.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-election">①選挙</span>
+      <span class="subcat">県議・市区町村議選</span>
+      <span class="event-name">県議会・市区町村議会議員選挙(全般)</span>
+      <span class="event-place">全国</span>
+      <span class="status s-tbd">要確認</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">2026は統一地方選の年ではない(次回統一地方選は2027)。県議は補欠選が中心。市区町村議選は毎週末に多数</span> <a class="event-source" href="https://go2senkyo.com/schedule/2026" target="_blank">go2senkyo.com</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来</span>
+      <span class="event-name">高市首相 欧州訪問</span>
+      <span class="event-place">欧州(英・伊等)</span>
+      <span class="attendee">高市首相</span>
+      <span class="status s-adj">調整中</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">6月中旬。G7出席に合わせ英・伊等と二国間会談を調整中</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">国際会議</span>
+      <span class="event-name">ASEAN関連首脳会議(東アジアサミット等)</span>
+      <span class="event-place">フィリピン(議長国)</span>
+      <span class="attendee">首相</span>
+      <span class="status s-pending">未確定</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">10〜11月見込み。EAS(東アジアサミット)はASEAN首脳会議に合わせて開催が通例</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">国際会議</span>
+      <span class="event-name">G20財務大臣・中央銀行総裁会議</span>
+      <span class="attendee">財務相・日銀総裁</span>
+      <span class="status s-pending">未確定</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">年複数回。財務省ページで更新</span> <a class="event-source" href="https://www.mof.go.jp/policy/international_policy/convention/schedule/index.html" target="_blank">www.mof.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">国際会議</span>
+      <span class="event-name">IMF・世界銀行 年次総会</span>
+      <span class="event-place">米国・ワシントン</span>
+      <span class="attendee">財務相・日銀総裁</span>
+      <span class="status s-pending">未確定</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">例年10月</span> <a class="event-source" href="https://www.mof.go.jp/policy/international_policy/convention/schedule/index.html" target="_blank">www.mof.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">国際会議</span>
+      <span class="event-name">列国議会同盟(IPU)総会</span>
+      <span class="attendee">議長・委員長等の国会議員</span>
+      <span class="status s-pending">未確定</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">春・秋。2026の確定日程は未確認</span> <a class="event-source" href="https://www.ipu.org/" target="_blank">www.ipu.org</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来(見送り/未定)</span>
+      <span class="event-name">国賓・公賓の来日(2026後半)</span>
+      <span class="status s-pending">未発表</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">確定した招請は現時点で未発表。迎賓館・外務省で随時公表</span> <a class="event-source" href="https://www.geihinkan.go.jp/" target="_blank">www.geihinkan.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-garden">③園遊会</span>
+      <span class="subcat">園遊会</span>
+      <span class="event-name">秋の園遊会2026</span>
+      <span class="event-place">赤坂御苑(東京・元赤坂)</span>
+      <span class="attendee">両議院議長副議長・議員・首相・国務大臣・知事等</span>
+      <span class="status s-pending">未発表</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">例年10月下旬〜11月初旬(参考:2024秋10/30・2025秋10/28)。宮内庁発表待ち</span> <a class="event-source" href="https://www.kunaicho.go.jp/about/gokomu/kyuchu/enyukai/enyukai.html" target="_blank">www.kunaicho.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-festival">④祭り</span>
+      <span class="subcat">祭り</span>
+      <span class="event-name">夏の花火大会(江戸川区花火等)</span>
+      <span class="event-place">東京都内</span>
+      <span class="status s-tbd">要確認</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">※東京湾大華火祭は2026年に11年ぶり復活だが10月開催に変更（下記参照）。江戸川区花火等は日程要確認</span> <a class="event-source" href="https://hanabi.walkerplus.com/area/ar0313/" target="_blank">hanabi.walkerplus.com</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ 実施済み・終了等 ═══════════════════════════ -->
+<div class="unsched-section done-section" id="done">
+  <div class="unsched-title done-title">✅ 実施済み・終了・見送り（日付未登録）</div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来(見送り/未定)</span>
+      <span class="event-name">日中韓サミット</span>
+      <span class="event-place">日本(議長国)</span>
+      <span class="status s-pending">見送り</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">台湾有事を巡る答弁以降の日中対立を受け年内見送りが確実な情勢</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来(見送り/未定)</span>
+      <span class="event-name">日中首脳の相互往来(習近平訪日/高市訪中)</span>
+      <span class="status s-pending">未定</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">日中関係悪化により具体日程なし</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来(実施済み)</span>
+      <span class="event-name">マクロン仏大統領 来日(日仏首脳会談)</span>
+      <span class="event-place">日本</span>
+      <span class="attendee">高市首相・マクロン大統領</span>
+      <span class="status s-done">実施済み</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">3月</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来(実施済み)</span>
+      <span class="event-name">カーニー加首相 来日(日加首脳会談)</span>
+      <span class="event-place">日本</span>
+      <span class="attendee">高市首相・カーニー首相</span>
+      <span class="status s-done">実施済み</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">3月</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来(実施済み)</span>
+      <span class="event-name">ウォン シンガポール首相 来日</span>
+      <span class="event-place">日本</span>
+      <span class="attendee">高市首相・ウォン首相</span>
+      <span class="status s-done">実施済み</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">3月</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-diplomacy">②外交</span>
+      <span class="subcat">外交往来(実施済み)</span>
+      <span class="event-name">高市首相 ベトナム・オーストラリア訪問</span>
+      <span class="event-place">ベトナム・豪州</span>
+      <span class="attendee">高市首相</span>
+      <span class="status s-done">実施済み</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">5月上旬。日豪友好協力基本条約署名50周年</span> <a class="event-source" href="https://www.mofa.go.jp/mofaj/gaiko/calendar/index.html" target="_blank">www.mofa.go.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-festival">④祭り</span>
+      <span class="subcat">祭り</span>
+      <span class="event-name">三社祭(浅草神社)</span>
+      <span class="event-place">東京・浅草</span>
+      <span class="status s-done">終了(2026)</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">5月中旬。2026は終了</span> <a class="event-source" href="https://www.asakusajinja.jp/sanjamatsuri/" target="_blank">www.asakusajinja.jp</a></div>
+  </div>
+  <div class="unsched-row">
+    <div class="event-main">
+      <span class="tag tag-festival">④祭り</span>
+      <span class="subcat">祭り</span>
+      <span class="event-name">神田祭(神田明神)</span>
+      <span class="event-place">東京・神田</span>
+      <span class="status s-adj">陰祭(2026)</span>
+    </div>
+    <div class="event-meta"><span class="event-notes">2026は陰祭。賑やかな本祭は奇数年=2025</span> <a class="event-source" href="https://www.kandamyojin.or.jp/kandamatsuri/" target="_blank">www.kandamyojin.or.jp</a></div>
+  </div>
+</div>
+<footer>スプレッドシート照合済み — 2026年6月16日更新</footer>
+</div>
+</body>
+</html>
